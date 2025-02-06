@@ -1,0 +1,110 @@
+/* Ensure the app uses the full height of the viewport */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Full-height layout for the app */
+.App {
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  height: 100vh; /* Use the full viewport height */
+}
+
+/* Header styling */
+header {
+  flex-shrink: 0; /* Prevent the header from shrinking */
+  background-color: #4a90e2;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Calendar container */
+.calendar-container {
+  flex-grow: 1; /* Expand to fill the remaining space */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+  padding: 1rem;
+  background-color: #f3f4f6; /* Light gray background for contrast */
+  display: flex;
+  flex-direction: column; /* Ensure children stack vertically */
+}
+
+/* Days of the Week */
+.grid-cols-7 > div {
+  text-align: center;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+
+/* Calendar grid */
+.calendar-grid {
+  flex-grow: 1; /* Allow the grid to expand and fill the remaining space */
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columns for days of the week */
+  grid-auto-rows: minmax(80px, auto); /* Set a minimum height for each cell */
+  gap: 0.5rem; /* Space between cells */
+}
+
+/* Day cell styling */
+.day-cell {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: white;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden; /* Prevent content from overflowing */
+  font-size: 0.8rem; /* Default font size */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .calendar-grid {
+    grid-auto-rows: minmax(60px, auto); /* Smaller height for smaller screens */
+  }
+
+  .day-cell {
+    font-size: 0.7rem; /* Smaller font size */
+    padding: 0.3rem; /* Reduced padding */
+  }
+
+  .grid-cols-7 > div {
+    font-size: 0.7rem; /* Smaller font size for days of the week */
+    padding: 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-grid {
+    grid-auto-rows: minmax(50px, auto); /* Even smaller height for very small screens */
+  }
+
+  .day-cell {
+    font-size: 0.6rem; /* Even smaller font size */
+    padding: 0.2rem; /* Further reduced padding */
+  }
+
+  .grid-cols-7 > div {
+    font-size: 0.6rem; /* Even smaller font size for days of the week */
+    padding: 0.2rem;
+  }
+}
+
+/* Highlight today's date */
+.day-cell.border-2 {
+    border-width: 2px; /* Thicker border for emphasis */
+    border-color: #4a90e2; /* Blue border */
+  }
+  
+  .day-cell.bg-blue-50 {
+    background-color: #e7f3ff; /* Light blue background */
+  }
+  
+  /* Ensure the text color for today's date stands out */
+  .text-blue-700 {
+    color: #007bff; /* Bright blue text */
+  }
