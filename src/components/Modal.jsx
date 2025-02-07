@@ -1,156 +1,181 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-const Modal = ({ isOpen, onClose, onSave, date }) => {
-  const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:00");
-  const [color, setColor] = useState("#3498db");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  // Reset modal state when the modal opens or closes
-  useEffect(() => {
-    if (isOpen) {
-      setTitle("");
-      setStartTime("09:00");
-      setEndTime("10:00");
-      setColor("#3498db");
-      setErrorMessage("");
-    }
-  }, [isOpen]);
+const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
+  const [title, setTitle] = useState(initialEvent?.title || "");
+  const [startHour, setStartHour] = useState(
+    initialEvent?.startTime.split(":")[0] || "09"
+  );
+  const [startMinute, setStartMinute] = useState(
+    initialEvent?.startTime.split(":")[1] || "00"
+  );
+  const [endHour, setEndHour] = useState(
+    initialEvent?.endTime.split(":")[0] || "10"
+  );
+  const [endMinute, setEndMinute] = useState(
+    initialEvent?.endTime.split(":")[1] || "00"
+  );
+  const [color, setColor] = useState(initialEvent?.color || "#007bff");
 
   if (!isOpen) return null;
 
-  // Generate time options in 30-minute increments
-  const generateTimeOptions = () => {
-    const times = [];
-    for (let hour = 0; hour < 24; hour++) {
-      times.push(`${String(hour).padStart(2, "0")}:00`);
-      times.push(`${String(hour).padStart(2, "0")}:30`);
-    }
-    return times;
-  };
+  // Generate options for hours (00 to 23)
+  const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+
+  // Generate options for minutes (00, 15, 30, 45)
+  const minutes = ["00", "15", "30", "45"];
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title || !date) return;
+    const newEvent = {
+      id: initialEvent?.id || Date.now(), // Generate unique ID
+      title,
+      startTime: `${startHour}:${startMinute}`,
+      endTime: `${endHour}:${endMinute}`,
+      color,
+      date: date || initialEvent?.date, // Use the selected date or the event's original date
+    };
+    console.log("Saving event:", newEvent); // Debugging log
+    onSave(newEvent); // Save the event
+    onClose(); // Close the modal
+  };
 
-    // Validate start time and end time
-    if (startTime >= endTime) {
-      setErrorMessage("Start time cannot be after or equal to end time.");
-      return;
-    }
-
-    // Create the new event object
-    const newEvent = { date, title, startTime, endTime, color };
-
-    // Call onSave and handle errors
-    const success = onSave(newEvent);
-    if (!success) {
-      setErrorMessage("Another event is already scheduled at this time.");
-    } else {
-      setErrorMessage(""); // Clear any previous error
-      onClose(); // Close the modal after saving
-    }
+  const handleDelete = () => {
+    onDelete(initialEvent?.id); // Delete the event by its ID
+    onClose(); // Close the modal
   };
 
   return (
-    <div
-      className="fixed inset-0 flex justify-center items-center z-50"
-      style={{
-        display: isOpen ? "flex" : "none",
-      }}
-    >
-      {/* Modal Content */}
-      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative z-50">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Add Event</h2>
-        {errorMessage && (
-          <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
-        )}
-        <form onSubmit={handleSubmit}>
-          {/* Event Title */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity z-40"
+        onClick={onClose}
+      />
+
+      {/* Modal Container */}
+      <form
+        onSubmit={handleSubmit}
+        className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      >
+        <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all p-6 space-y-4">
+          {/* Title */}
+          <div>
+            <label className="block text-gray-600 font-medium mb-1">
               Event Title
             </label>
             <input
               type="text"
-              placeholder="Enter event title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
               required
             />
           </div>
 
           {/* Start Time */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div>
+            <label className="block text-gray-600 font-medium mb-1">
               Start Time
             </label>
-            <select
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-            >
-              {generateTimeOptions().map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                value={startHour}
+                onChange={(e) => setStartHour(e.target.value)}
+                className="w-1/2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+              >
+                {hours.map((hour) => (
+                  <option key={hour} value={hour}>
+                    {hour}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={startMinute}
+                onChange={(e) => setStartMinute(e.target.value)}
+                className="w-1/2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+              >
+                {minutes.map((minute) => (
+                  <option key={minute} value={minute}>
+                    {minute}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* End Time */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div>
+            <label className="block text-gray-600 font-medium mb-1">
               End Time
             </label>
-            <select
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-            >
-              {generateTimeOptions().map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                value={endHour}
+                onChange={(e) => setEndHour(e.target.value)}
+                className="w-1/2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+              >
+                {hours.map((hour) => (
+                  <option key={hour} value={hour}>
+                    {hour}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={endMinute}
+                onChange={(e) => setEndMinute(e.target.value)}
+                className="w-1/2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+              >
+                {minutes.map((minute) => (
+                  <option key={minute} value={minute}>
+                    {minute}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Event Color */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          {/* Color Picker */}
+          <div>
+            <label className="block text-gray-600 font-medium mb-1">
               Event Color
             </label>
             <input
               type="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full h-10 rounded-lg focus:outline-none"
             />
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-2">
+          {/* Buttons */}
+          <div className="flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition duration-200 active:scale-95"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition duration-200 active:scale-95"
             >
               Save
             </button>
+            {initialEvent && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition duration-200 active:scale-95"
+              >
+                Delete
+              </button>
+            )}
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </>
   );
 };
 

@@ -19,6 +19,9 @@ const Calendar = ({ events, onDayClick, onViewEvent }) => {
   const firstDayOfMonth = getFirstDayOfMonth(currentDate);
   const daysInMonth = getDaysInMonth(currentDate);
 
+  // Calculate the total number of rows needed for the calendar grid
+  const totalRows = Math.ceil((firstDayOfMonth + daysInMonth) / 7);
+
   // Generate the dates array for the calendar grid
   const dates = Array.from({ length: firstDayOfMonth }, () => null).concat(
     Array.from({ length: daysInMonth }, (_, i) => i + 1)
@@ -68,14 +71,21 @@ const Calendar = ({ events, onDayClick, onViewEvent }) => {
       </div>
 
       {/* Days of the Week */}
-      <div className="grid grid-cols-7 gap-2 text-center font-semibold text-gray-600 text-xs md:text-sm">
+      <div className="days-of-week">
         {daysOfWeek.map((day) => (
-          <div key={day} className="py-2">{day}</div>
+          <div key={day} className="py-2">
+            {day}
+          </div>
         ))}
       </div>
 
       {/* Dates Grid */}
-      <div className="calendar-grid">
+      <div
+        className="calendar-grid flex-grow"
+        style={{
+          gridTemplateRows: `repeat(${totalRows}, minmax(80px, 1fr))`, // Dynamically set rows
+        }}
+      >
         {dates.map((day, index) => {
           const formattedDate = day
             ? `${currentDate.getFullYear()}-${String(
