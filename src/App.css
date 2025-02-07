@@ -3,7 +3,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: scroll;  /* Enable scrolling */
+  overflow-y: scroll; /* Enable scrolling */
   scrollbar-width: none; /* Hide scrollbar (Firefox) */
   -ms-overflow-style: none; /* Hide scrollbar (IE/Edge) */
 }
@@ -74,6 +74,16 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   font-size: 0.9rem;
   min-height: 80px;
   overflow: hidden;
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+/* Hover effect for day cells */
+.day-cell:hover {
+  background-color: #f0f8ff; /* Light blue background on hover */
+  border-color: #b3d4fc; /* Slightly darker border on hover */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+  transform: scale(1.02); /* Slight zoom effect on hover */
+  cursor: pointer; /* Pointer cursor to indicate interactivity */
 }
 
 /* RESPONSIVE DESIGN */
@@ -116,3 +126,24 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
     min-height: 50px;
   }
 }
+
+.day-cell.today {
+  background-color: #e1f5fe; /* Softer light blue background */
+  border: 2px solid #0288d1; /* Bold, vibrant blue border */
+  box-shadow: 0px 6px 12px rgba(2, 136, 209, 0.2); /* Subtle shadow for depth */
+  border-radius: 12px; /* Slightly rounded corners for a modern look */
+  font-weight: 600; /* Semi-bold text for emphasis */
+  color: #01579b; /* Deep blue text for contrast */
+  transition: all 0.3s ease; /* Smooth hover transitions */
+}
+
+/* Hover effect for today's cell */
+.day-cell.today:hover {
+  background-color: #b3e5fc; /* Slightly darker blue on hover */
+  transform: scale(1.02); /* Slight zoom effect */
+  box-shadow: 0px 8px 16px rgba(2, 136, 209, 0.3); /* Stronger shadow on hover */
+  cursor: pointer; /* Pointer cursor to indicate interactivity */
+}
+
+
+

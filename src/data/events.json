@@ -1,23 +1,44 @@
 [
-    {
-      "title": "Team Meeting",
-      "date": "2025-02-05",
-      "startTime": "10:00 AM",
-      "endTime": "11:00 AM",
-      "color": "#FF5733"
-    },
-    {
-      "title": "Lunch Break",
-      "date": "2025-02-06",
-      "startTime": "12:00 PM",
-      "endTime": "12:30 PM",
-      "color": "#33FF57"
-    },
-    {
-      "title": "Project Deadline",
-      "date": "2023-10-16",
-      "startTime": "5:00 PM",
-      "endTime": "N/A",
-      "color": "#3357FF"
-    }
-  ]
+  {
+    "title": "Team Meeting",
+    "date": "2025-02-05",
+    "startTime": "10:00 AM",
+    "endTime": "11:00 AM",
+    "color": "#FF5733"
+  },
+  {
+    "title": "Lunch Break",
+    "date": "2025-02-06",
+    "startTime": "12:00 PM",
+    "endTime": "12:30 PM",
+    "color": "#33FF57"
+  },
+  {
+    "title": "Project Deadline",
+    "date": "2025-03-11",
+    "startTime": "5:00 PM",
+    "endTime": "N/A",
+    "color": "#3357FF"
+  },
+  {
+    "title": "Code Review",
+    "date": "2025-02-07",
+    "startTime": "2:00 PM",
+    "endTime": "3:00 PM",
+    "color": "#FF33A6"
+  },
+  {
+    "title": "Client Meeting",
+    "date": "2025-03-08",
+    "startTime": "9:00 AM",
+    "endTime": "10:00 AM",
+    "color": "#33A6FF"
+  },
+  {
+    "title": "Sprint Planning",
+    "date": "2025-02-09",
+    "startTime": "11:00 AM",
+    "endTime": "12:30 PM",
+    "color": "#FFCC33"
+  }
+]

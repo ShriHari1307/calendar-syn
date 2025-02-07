@@ -1,9 +1,36 @@
 /* eslint-disable react/prop-types */
 import Day from "./Day";
+import Modal from "./Modal"; // Import the Modal component
 import { useState } from "react";
 
-const Calendar = ({ events, onDayClick, onViewEvent }) => {
+// Utility function to check for overlapping events
+const isOverlapping = (newEvent, existingEvents) => {
+  const [newStart, newEnd] = [
+    new Date(`1970-01-01T${newEvent.startTime}:00`),
+    new Date(`1970-01-01T${newEvent.endTime || "23:59"}:00`),
+  ];
+
+  return existingEvents.some((event) => {
+    const [existingStart, existingEnd] = [
+      new Date(`1970-01-01T${event.startTime}:00`),
+      new Date(`1970-01-01T${event.endTime || "23:59"}:00`),
+    ];
+
+    // Check for overlap
+    return (
+      (newStart >= existingStart && newStart < existingEnd) || // New event starts during an existing event
+      (newEnd > existingStart && newEnd <= existingEnd) || // New event ends during an existing event
+      (newStart <= existingStart && newEnd >= existingEnd) // New event encompasses an existing event
+    );
+  });
+};
+
+const Calendar = ({ events, onViewEvent }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [allEvents, setAllEvents] = useState(events); // State to store all events
+  const [error, setError] = useState(""); // State to store error messages
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+  const [selectedDate, setSelectedDate] = useState(null); // State to store the selected date
 
   // Function to get the first day of the month
   const getFirstDayOfMonth = (date) => {
@@ -43,7 +70,24 @@ const Calendar = ({ events, onDayClick, onViewEvent }) => {
     const formattedDate = `${currentDate.getFullYear()}-${String(
       currentDate.getMonth() + 1
     ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return events.filter((event) => event.date === formattedDate);
+    return allEvents.filter((event) => event.date === formattedDate);
+  };
+
+  // Function to add a new event
+  const addEvent = (newEvent) => {
+    const formattedDate = `${newEvent.date}`;
+    const existingEvents = allEvents.filter((event) => event.date === formattedDate);
+
+    // Check for overlapping events
+    if (isOverlapping(newEvent, existingEvents)) {
+      setError("An event already exists at this time."); // Set error message
+      return;
+    }
+
+    // Clear any previous error and add the new event
+    setError("");
+    setAllEvents([...allEvents, newEvent]);
+    setIsModalOpen(false); // Close the modal after saving
   };
 
   return (
@@ -71,17 +115,15 @@ const Calendar = ({ events, onDayClick, onViewEvent }) => {
       </div>
 
       {/* Days of the Week */}
-      <div className="days-of-week">
+      <div className="grid grid-cols-7 gap-2 text-center text-sm font-semibold mb-2">
         {daysOfWeek.map((day) => (
-          <div key={day} className="py-2">
-            {day}
-          </div>
+          <div key={day} className="py-2">{day}</div>
         ))}
       </div>
 
       {/* Dates Grid */}
       <div
-        className="calendar-grid flex-grow"
+        className="calendar-grid grid grid-cols-7 gap-2"
         style={{
           gridTemplateRows: `repeat(${totalRows}, minmax(80px, 1fr))`, // Dynamically set rows
         }}
@@ -93,11 +135,13 @@ const Calendar = ({ events, onDayClick, onViewEvent }) => {
               ).padStart(2, "0")}-${String(day).padStart(2, "0")}`
             : null;
 
-          // Disable clicking on past dates
+          // Check if the day is today
           const today = new Date();
-          const isPastDate =
+          const isToday =
             day &&
-            new Date(formattedDate) < today.setHours(0, 0, 0, 0);
+            today.getDate() === Number(day) &&
+            today.getMonth() + 1 === currentDate.getMonth() + 1 &&
+            today.getFullYear() === currentDate.getFullYear();
 
           return (
             <Day
@@ -105,15 +149,28 @@ const Calendar = ({ events, onDayClick, onViewEvent }) => {
               date={formattedDate}
               events={day ? getEventsForDate(day) : []}
               onDayClick={(e, date) => {
-                if (!isPastDate) {
-                  onDayClick(date); // Trigger add event modal
-                }
+                setSelectedDate(date); // Set the selected date
+                setIsModalOpen(true); // Open the modal
               }}
               onViewEvent={onViewEvent} // Trigger view event modal
+              isToday={isToday} // Pass isToday to Day component
             />
           );
         })}
       </div>
+
+      {/* Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setError(""); // Clear error when closing the modal
+        }}
+        onSave={addEvent} // Save the event
+        onDelete={() => {}} // No delete functionality for new events
+        date={selectedDate} // Pass the selected date
+        error={error} // Pass the error message to the modal
+      />
     </div>
   );
 };

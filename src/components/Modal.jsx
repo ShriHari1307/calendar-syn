@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 
-const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
+const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error }) => {
   const [title, setTitle] = useState(initialEvent?.title || "");
   const [startHour, setStartHour] = useState(
     initialEvent?.startTime.split(":")[0] || "09"
@@ -19,9 +19,18 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
 
   if (!isOpen) return null;
 
+  // Function to reset the modal's state
+  const resetModal = () => {
+    setTitle("");
+    setStartHour("09");
+    setStartMinute("00");
+    setEndHour("10");
+    setEndMinute("00");
+    setColor("#007bff");
+  };
+
   // Generate options for hours (00 to 23)
   const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
-
   // Generate options for minutes (00, 15, 30, 45)
   const minutes = ["00", "15", "30", "45"];
 
@@ -37,12 +46,12 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
     };
     console.log("Saving event:", newEvent); // Debugging log
     onSave(newEvent); // Save the event
-    onClose(); // Close the modal
+    resetModal(); // Reset the modal's state
   };
 
   const handleDelete = () => {
     onDelete(initialEvent?.id); // Delete the event by its ID
-    onClose(); // Close the modal
+    resetModal(); // Reset the modal's state
   };
 
   return (
@@ -52,13 +61,16 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity z-40"
         onClick={onClose}
       />
-
       {/* Modal Container */}
       <form
         onSubmit={handleSubmit}
         className="fixed inset-0 flex items-center justify-center z-50 p-4"
       >
         <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all p-6 space-y-4">
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-500 text-sm">{error}</div>
+          )}
           {/* Title */}
           <div>
             <label className="block text-gray-600 font-medium mb-1">
@@ -72,7 +84,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
               required
             />
           </div>
-
           {/* Start Time */}
           <div>
             <label className="block text-gray-600 font-medium mb-1">
@@ -103,7 +114,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
               </select>
             </div>
           </div>
-
           {/* End Time */}
           <div>
             <label className="block text-gray-600 font-medium mb-1">
@@ -134,7 +144,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
               </select>
             </div>
           </div>
-
           {/* Color Picker */}
           <div>
             <label className="block text-gray-600 font-medium mb-1">
@@ -147,12 +156,14 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent }) => {
               className="w-full h-10 rounded-lg focus:outline-none"
             />
           </div>
-
           {/* Buttons */}
           <div className="flex justify-end gap-3">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                onClose();
+                resetModal(); // Reset the modal's state on close
+              }}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition duration-200 active:scale-95"
             >
               Cancel

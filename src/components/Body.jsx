@@ -16,23 +16,22 @@ const Body = ({ events, setEvents }) => {
     return events.some(
       (event) =>
         event.date === newEvent.date &&
-        newEvent.startTime < event.endTime && // New event starts before existing event ends
-        newEvent.endTime > event.startTime // New event ends after existing event starts
+        newEvent.startTime < event.endTime && 
+        newEvent.endTime > event.startTime 
     );
   };
 
   // Function to add a new event
   const addEvent = (newEvent) => {
     if (hasTimeConflict(newEvent)) {
-      return false; // Indicate failure
+      return false;
     }
-    // Add the event with isStatic: false
     setEvents((prevEvents) => [
       ...prevEvents,
-      { ...newEvent, isStatic: false }, // Mark user-added events as non-static
+      { ...newEvent, isStatic: false }, 
     ]);
-    setIsAddEventModalOpen(false); // Close the modal after saving
-    return true; // Indicate success
+    setIsAddEventModalOpen(false);
+    return true; 
   };
 
   // Function to edit an event
@@ -47,8 +46,8 @@ const Body = ({ events, setEvents }) => {
         event.id === updatedEvent.id ? updatedEvent : event
       )
     );
-    setIsAddEventModalOpen(false); // Close the modal after editing
-    setErrorMessage(""); // Clear any previous error message
+    setIsAddEventModalOpen(false); 
+    setErrorMessage(""); 
   };
 
   // Function to delete an event
@@ -61,8 +60,8 @@ const Body = ({ events, setEvents }) => {
     setEvents((prevEvents) =>
       prevEvents.filter((event) => event.id !== eventToDelete.id)
     );
-    setIsViewEventModalOpen(false); // Close the modal after deleting
-    setErrorMessage(""); // Clear any previous error message
+    setIsViewEventModalOpen(false); 
+    setErrorMessage(""); 
   };
 
   return (
@@ -81,13 +80,13 @@ const Body = ({ events, setEvents }) => {
           <Calendar
             events={events}
             onDayClick={(date) => {
-              setSelectedDate(date); // Set the selected date
-              setSelectedEvent(null); // Clear the selected event when adding a new one
-              setIsAddEventModalOpen(true); // Open the add event modal
+              setSelectedDate(date); 
+              setSelectedEvent(null);
+              setIsAddEventModalOpen(true);
             }}
             onViewEvent={(event) => {
-              setSelectedEvent(event); // Set the selected event for viewing
-              setIsViewEventModalOpen(true); // Open the view event modal
+              setSelectedEvent(event);
+              setIsViewEventModalOpen(true); 
             }}
           />
         </div>
@@ -98,9 +97,9 @@ const Body = ({ events, setEvents }) => {
         <Modal
           isOpen={isAddEventModalOpen}
           onClose={() => setIsAddEventModalOpen(false)}
-          onSave={selectedEvent ? editEvent : addEvent} // Use editEvent if editing, otherwise addEvent
-          date={selectedDate} // Pass the selected date to the modal
-          initialEvent={selectedEvent} // Pass the selected event for editing
+          onSave={selectedEvent ? editEvent : addEvent} 
+          date={selectedDate}
+          initialEvent={selectedEvent}
         />
       )}
 
@@ -108,22 +107,22 @@ const Body = ({ events, setEvents }) => {
       {isViewEventModalOpen && (
         <EventDetailsModal
           isOpen={isViewEventModalOpen}
-          onClose={() => setIsViewEventModalOpen(false)} // Close modal
+          onClose={() => setIsViewEventModalOpen(false)} 
           event={selectedEvent}
           onEdit={() => {
             if (selectedEvent?.isStatic) {
               setErrorMessage("You cannot edit static data.");
               return;
             }
-            setIsViewEventModalOpen(false); // Close the view modal
-            setIsAddEventModalOpen(true); // Open the add/edit modal for editing
+            setIsViewEventModalOpen(false); 
+            setIsAddEventModalOpen(true); 
           }}
           onDelete={() => {
             if (selectedEvent?.isStatic) {
               setErrorMessage("You cannot delete static data.");
               return;
             }
-            deleteEvent(selectedEvent); // Delete the event
+            deleteEvent(selectedEvent); 
           }}
         />
       )}
