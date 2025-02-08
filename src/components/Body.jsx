@@ -1,6 +1,5 @@
-// Body.js
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "./Calendar";
 import Modal from "./Modal";
 import EventDetailsModal from "./EventDetailModal";
@@ -11,6 +10,17 @@ const Body = ({ events, setEvents }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // useEffect to clear errorMessage after 2 seconds
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 2000);
+
+      return () => clearTimeout(timer); // Clear timeout if component unmounts
+    }
+  }, [errorMessage]);
 
   const hasTimeConflict = (newEvent, eventToExclude = null) => {
     return events.some(
@@ -77,7 +87,9 @@ const Body = ({ events, setEvents }) => {
   return (
     <>
       {errorMessage && (
-        <div className="text-red-500 text-sm mt-2 mb-2">{errorMessage}</div>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-red-200 border border-red-500 text-red-700 px-4 py-2 rounded shadow-md transition-opacity duration-300">
+          {errorMessage}
+        </div>
       )}
 
       <Calendar
