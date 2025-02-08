@@ -1,7 +1,15 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 
-const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  onSave,
+  onDelete,
+  date,
+  initialEvent,
+  error,
+}) => {
   const [title, setTitle] = useState(initialEvent?.title || "");
   const [startHour, setStartHour] = useState(
     initialEvent?.startTime?.split(":")[0] || "09"
@@ -9,11 +17,14 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
   const [startMinute, setStartMinute] = useState(
     initialEvent?.startTime?.split(":")[1] || "00"
   );
-  const [endHour, setEndHour] = useState(initialEvent?.endTime?.split(":")[0] || "10");
+  const [endHour, setEndHour] = useState(
+    initialEvent?.endTime?.split(":")[0] || "10"
+  );
   const [endMinute, setEndMinute] = useState(
     initialEvent?.endTime?.split(":")[1] || "00"
   );
   const [color, setColor] = useState(initialEvent?.color || "#007bff");
+  const [validationError, setValidationError] = useState("");
 
   if (!isOpen) return null;
 
@@ -24,13 +35,31 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
     setEndHour("10");
     setEndMinute("00");
     setColor("#007bff");
+    setValidationError(""); // Clear validation error on reset
   };
 
-  const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+  const hours = Array.from({ length: 24 }, (_, i) =>
+    String(i).padStart(2, "0")
+  );
   const minutes = ["00", "15", "30", "45"];
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validate start time and end time
+    const startTimeInMinutes =
+      parseInt(startHour, 10) * 60 + parseInt(startMinute, 10);
+    const endTimeInMinutes =
+      parseInt(endHour, 10) * 60 + parseInt(endMinute, 10);
+
+    if (startTimeInMinutes >= endTimeInMinutes) {
+      setValidationError("Start time must be before end time.");
+      return;
+    }
+
+    // Clear any previous validation errors
+    setValidationError("");
+
     const newEvent = {
       id: initialEvent?.id || Date.now(),
       title,
@@ -58,7 +87,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity z-40"
         onClick={onClose}
       />
-
       {/* Modal Content */}
       <form
         onSubmit={handleSubmit}
@@ -69,17 +97,24 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
           <h2 className="text-xl font-bold text-gray-800">
             {initialEvent ? "Edit Event" : "Add Event"}
           </h2>
-
           {/* Error Message */}
           {error && (
             <div className="text-red-500 text-sm bg-red-100 p-2 rounded-md">
               {error}
             </div>
           )}
-
+          {/* Validation Error */}
+          {validationError && (
+            <div className="text-red-500 text-sm bg-red-100 p-2 rounded-md">
+              {validationError}
+            </div>
+          )}
           {/* Event Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700"
+            >
               Event Title
             </label>
             <input
@@ -91,7 +126,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
               required
             />
           </div>
-
           {/* Start and End Time */}
           <div className="grid grid-cols-2 gap-4">
             {/* Start Time */}
@@ -128,7 +162,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
                 </select>
               </div>
             </div>
-
             {/* End Time */}
             <div>
               <label
@@ -164,7 +197,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
               </div>
             </div>
           </div>
-
           {/* Event Color */}
           <div>
             <label
@@ -181,7 +213,6 @@ const Modal = ({ isOpen, onClose, onSave, onDelete, date, initialEvent, error })
               className="h-10 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 mt-1"
             />
           </div>
-
           {/* Action Buttons */}
           <div className="flex justify-end space-x-2">
             <button
