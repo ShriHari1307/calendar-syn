@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import Day from "./Day";
 import Modal from "./Modal"; // Import the Modal component
-import { useState } from "react";
+import { useState, } from "react";
 
 // Utility function to check for overlapping events
 const isOverlapping = (newEvent, existingEvents) => {
@@ -25,9 +25,8 @@ const isOverlapping = (newEvent, existingEvents) => {
   });
 };
 
-const Calendar = ({ events, onViewEvent }) => {
+const Calendar = ({ events, onViewEvent, onAddEvent }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [allEvents, setAllEvents] = useState(events); // State to store all events
   const [error, setError] = useState(""); // State to store error messages
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
   const [selectedDate, setSelectedDate] = useState(null); // State to store the selected date
@@ -70,13 +69,13 @@ const Calendar = ({ events, onViewEvent }) => {
     const formattedDate = `${currentDate.getFullYear()}-${String(
       currentDate.getMonth() + 1
     ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return allEvents.filter((event) => event.date === formattedDate);
+    return events.filter((event) => event.date === formattedDate);
   };
 
   // Function to add a new event
   const addEvent = (newEvent) => {
     const formattedDate = `${newEvent.date}`;
-    const existingEvents = allEvents.filter((event) => event.date === formattedDate);
+    const existingEvents = events.filter((event) => event.date === formattedDate);
 
     // Check for overlapping events
     if (isOverlapping(newEvent, existingEvents)) {
@@ -86,7 +85,7 @@ const Calendar = ({ events, onViewEvent }) => {
 
     // Clear any previous error and add the new event
     setError("");
-    setAllEvents([...allEvents, newEvent]);
+    onAddEvent(newEvent);
     setIsModalOpen(false); // Close the modal after saving
   };
 
@@ -117,7 +116,9 @@ const Calendar = ({ events, onViewEvent }) => {
       {/* Days of the Week */}
       <div className="grid grid-cols-7 gap-2 text-center text-sm font-semibold mb-2">
         {daysOfWeek.map((day) => (
-          <div key={day} className="py-2">{day}</div>
+          <div key={day} className="py-2">
+            {day}
+          </div>
         ))}
       </div>
 

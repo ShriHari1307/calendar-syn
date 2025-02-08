@@ -1,3 +1,4 @@
+// Body.js
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import Calendar from "./Calendar";
@@ -9,48 +10,53 @@ const Body = ({ events, setEvents }) => {
   const [isViewEventModalOpen, setIsViewEventModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Function to check for time conflicts
-  const hasTimeConflict = (newEvent) => {
+  const hasTimeConflict = (newEvent, eventToExclude = null) => {
     return events.some(
       (event) =>
         event.date === newEvent.date &&
-        newEvent.startTime < event.endTime && 
-        newEvent.endTime > event.startTime 
+        event.id !== (eventToExclude?.id || null) &&
+        newEvent.startTime < event.endTime &&
+        newEvent.endTime > event.startTime
     );
   };
 
-  // Function to add a new event
   const addEvent = (newEvent) => {
     if (hasTimeConflict(newEvent)) {
+      setErrorMessage("An event already exists at this time.");
       return false;
     }
     setEvents((prevEvents) => [
       ...prevEvents,
-      { ...newEvent, isStatic: false }, 
+      { ...newEvent, id: Date.now(), isStatic: false },
     ]);
     setIsAddEventModalOpen(false);
-    return true; 
+    setErrorMessage("");
+    return true;
   };
 
-  // Function to edit an event
-  const editEvent = (updatedEvent) => {
+  // Updated edit function
+  const updateEvent = (updatedEvent) => {
     if (updatedEvent.isStatic) {
       setErrorMessage("You cannot edit static data.");
       return;
     }
 
+    if (hasTimeConflict(updatedEvent, updatedEvent)) {
+      setErrorMessage("An event already exists at this time.");
+      return;
+    }
+
     setEvents((prevEvents) =>
       prevEvents.map((event) =>
-        event.id === updatedEvent.id ? updatedEvent : event
+        event.id === updatedEvent.id ? { ...updatedEvent } : event
       )
     );
-    setIsAddEventModalOpen(false); 
-    setErrorMessage(""); 
+    setIsViewEventModalOpen(false);
+    setErrorMessage("");
   };
 
-  // Function to delete an event
   const deleteEvent = (eventToDelete) => {
     if (eventToDelete.isStatic) {
       setErrorMessage("You cannot delete static data.");
@@ -60,70 +66,61 @@ const Body = ({ events, setEvents }) => {
     setEvents((prevEvents) =>
       prevEvents.filter((event) => event.id !== eventToDelete.id)
     );
-    setIsViewEventModalOpen(false); 
-    setErrorMessage(""); 
+    setIsViewEventModalOpen(false);
+    setErrorMessage("");
+  };
+
+  const handleCalendarAddEvent = (newEvent) => {
+    addEvent(newEvent);
   };
 
   return (
     <>
-      {/* Error Message */}
       {errorMessage && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4 mx-4">
-          <span className="block sm:inline">{errorMessage}</span>
-        </div>
+        <div className="text-red-500 text-sm mt-2 mb-2">{errorMessage}</div>
       )}
 
-      {/* Parent Container */}
-      <div className="parent-container">
-        {/* Calendar Container */}
-        <div className="calendar-container">
-          <Calendar
-            events={events}
-            onDayClick={(date) => {
-              setSelectedDate(date); 
-              setSelectedEvent(null);
-              setIsAddEventModalOpen(true);
-            }}
-            onViewEvent={(event) => {
-              setSelectedEvent(event);
-              setIsViewEventModalOpen(true); 
-            }}
-          />
-        </div>
-      </div>
+      <Calendar
+        key={events.length}
+        events={events}
+        onDayClick={(date) => {
+          setSelectedDate(date);
+          setSelectedEvent(null);
+          setIsAddEventModalOpen(true);
+        }}
+        onViewEvent={(event) => {
+          setSelectedEvent(event);
+          setIsViewEventModalOpen(true);
+        }}
+        onAddEvent={handleCalendarAddEvent}
+      />
 
-      {/* Add/Edit Event Modal */}
       {isAddEventModalOpen && (
         <Modal
           isOpen={isAddEventModalOpen}
-          onClose={() => setIsAddEventModalOpen(false)}
-          onSave={selectedEvent ? editEvent : addEvent} 
+          onClose={() => {
+            setIsAddEventModalOpen(false);
+            setErrorMessage("");
+            setSelectedEvent(null);
+          }}
+          onSave={selectedEvent ? updateEvent : addEvent}
+          onDelete={deleteEvent}
           date={selectedDate}
           initialEvent={selectedEvent}
+          error={errorMessage}
         />
       )}
 
-      {/* View Event Modal */}
-      {isViewEventModalOpen && (
+      {isViewEventModalOpen && selectedEvent && (
         <EventDetailsModal
           isOpen={isViewEventModalOpen}
-          onClose={() => setIsViewEventModalOpen(false)} 
+          onClose={() => {
+            setIsViewEventModalOpen(false);
+            setSelectedEvent(null);
+          }}
           event={selectedEvent}
-          onEdit={() => {
-            if (selectedEvent?.isStatic) {
-              setErrorMessage("You cannot edit static data.");
-              return;
-            }
-            setIsViewEventModalOpen(false); 
-            setIsAddEventModalOpen(true); 
-          }}
-          onDelete={() => {
-            if (selectedEvent?.isStatic) {
-              setErrorMessage("You cannot delete static data.");
-              return;
-            }
-            deleteEvent(selectedEvent); 
-          }}
+          onUpdate={updateEvent} // Updated to pass update function
+          onDelete={deleteEvent}
         />
       )}
     </>
