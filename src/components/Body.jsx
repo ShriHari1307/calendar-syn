@@ -11,14 +11,13 @@ const Body = ({ events, setEvents }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // useEffect to clear errorMessage after 2 seconds
   useEffect(() => {
     if (errorMessage) {
       const timer = setTimeout(() => {
         setErrorMessage("");
       }, 2000);
 
-      return () => clearTimeout(timer); // Clear timeout if component unmounts
+      return () => clearTimeout(timer);
     }
   }, [errorMessage]);
 
@@ -131,7 +130,7 @@ const Body = ({ events, setEvents }) => {
             setSelectedEvent(null);
           }}
           event={selectedEvent}
-          onUpdate={updateEvent} // Updated to pass update function
+          onUpdate={updateEvent} 
           onDelete={deleteEvent}
         />
       )}

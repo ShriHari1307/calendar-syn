@@ -5,7 +5,7 @@ const EventDetailsModal = ({ isOpen, onClose, event, onUpdate, onDelete }) => {
   const [editedEvent, setEditedEvent] = useState(event || {});
 
   useEffect(() => {
-    setEditedEvent(event || {}); // Ensure state updates when event changes
+    setEditedEvent(event || {}); 
   }, [event]);
 
   if (!isOpen || !event) return null;
@@ -20,7 +20,6 @@ const EventDetailsModal = ({ isOpen, onClose, event, onUpdate, onDelete }) => {
     onClose();
   };
 
-  // Generate hour and minute options
   const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
   const minutes = ["00", "15", "30", "45"];
 
@@ -41,7 +40,7 @@ const EventDetailsModal = ({ isOpen, onClose, event, onUpdate, onDelete }) => {
               {/* Color Picker */}
               <input
                 type="color"
-                value={editedEvent.color || "#007bff"} // Default color
+                value={editedEvent.color || "#007bff"} 
                 onChange={(e) =>
                   setEditedEvent({ ...editedEvent, color: e.target.value })
                 }
