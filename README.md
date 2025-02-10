@@ -67,9 +67,3 @@ The application will be available at `http://localhost:5173/`.
 - 📅 Weekly & Monthly view options
 - 🌙 Dark mode toggle
 
-## License
-This project is open-source under the [MIT License](LICENSE).
-
----
-Built with ❤️ using React, Vite & Tailwind. Happy coding! 🎉
-
