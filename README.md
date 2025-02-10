@@ -20,7 +20,7 @@ This is a **React Calendar Application** built with **Vite**, **Tailwind CSS**, 
 
 ### 1️⃣ Clone the Repository
 ```sh
-git clone https://github.com/your-repo/calendar-app.git
+https://github.com/ShriHari1307/calendar-syn.git
 cd calendar-app
 ```
 
