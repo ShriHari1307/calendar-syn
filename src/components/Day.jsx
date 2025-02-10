@@ -1,4 +1,3 @@
-// Day.js
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import EventsListModal from "./EventsListModal";
@@ -12,7 +11,6 @@ const Day = ({ date, events, onDayClick, onViewEvent, isToday }) => {
 
   const today = new Date();
   const isPastDate = new Date(date) < today.setHours(0, 0, 0, 0);
-
   const visibleEvents = events.slice(0, 2);
   const remainingEvents = events.length - visibleEvents.length;
 
@@ -40,7 +38,6 @@ const Day = ({ date, events, onDayClick, onViewEvent, isToday }) => {
         >
           {date.split("-")[2]}
         </div>
-
         <div
           className="flex-1 p-1 flex flex-col justify-start space-y-1 overflow-hidden"
           style={{ maxHeight: "calc(100% - 30px)" }}
@@ -50,8 +47,13 @@ const Day = ({ date, events, onDayClick, onViewEvent, isToday }) => {
               {visibleEvents.map((event, index) => (
                 <div
                   key={index}
-                  className="px-2 py-1 rounded-md text-xs md:text-sm text-white font-medium cursor-pointer truncate shadow-sm transition duration-300 hover:shadow-md"
-                  style={{ backgroundColor: event.color }}
+                  className={`px-2 py-1 rounded-md text-xs md:text-sm font-medium cursor-pointer truncate shadow-sm transition duration-300 hover:shadow-md ${
+                    isPastDate ? "line-through" : ""
+                  }`}
+                  style={{
+                    backgroundColor: event.color,
+                    color: isPastDate ? "#000" : "#fff", // Ensure text is readable
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     onViewEvent(event);
@@ -78,7 +80,6 @@ const Day = ({ date, events, onDayClick, onViewEvent, isToday }) => {
           )}
         </div>
       </div>
-
       <EventsListModal
         isOpen={isEventsModalOpen}
         onClose={() => setIsEventsModalOpen(false)}

@@ -45,7 +45,6 @@ const Body = ({ events, setEvents }) => {
     return true;
   };
 
-  // Updated edit function
   const updateEvent = (updatedEvent) => {
     if (updatedEvent.isStatic) {
       setErrorMessage("You cannot edit static data.");
